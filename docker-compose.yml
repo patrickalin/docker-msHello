@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  hello:
+    image: java:8u111-jre-alpine
+    container_name: hello
+    ports:
+     - "7030:8080"
+    volumes:
+     - ./opt:/opt/
+    entrypoint: java -jar /opt/gs-rest-service-0.1.0.jar
+    labels:
+        - traefik.frontend.rule=Host:hello.services.alin.be
+        - traefik.backend=hello
+        - traefik.frontend.entryPoints=http,https
+    networks:
+        - web
+
+networks:
+  web:
+    external:
+      name: traefik_webgateway
