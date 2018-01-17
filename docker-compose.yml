@@ -1,22 +1,24 @@
-version: '3.2'
+version: '3.5'
 
 services:
-  hello:
-    image: java:8u111-jre-alpine
-    container_name: hello
-    ports:
-     - "7030:8080"
-    volumes:
-     - ./opt:/opt/
-    entrypoint: java -jar /opt/gs-rest-service-0.1.0.jar
-    labels:
+  mshello:
+    image: mshello-image
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 100M
+      restart_policy:
+        condition: on-failure
+      labels:
+        - traefik.port=8080
         - traefik.frontend.rule=Host:hello.services.alin.be
-        - traefik.backend=hello
         - traefik.frontend.entryPoints=http,https
-    networks:
-        - web
+        - traefik.backend.loadbalancer.method=wrr
+    entrypoint: java -jar /opt/gs-rest-service-0.1.0.jar
 
 networks:
-  web:
+  default:
     external:
-      name: traefik_webgateway
+      name: traefik-net
